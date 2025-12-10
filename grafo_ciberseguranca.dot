@@ -1,0 +1,85 @@
+digraph GrafoConhecimento {
+  rankdir=LR;
+  "app_loja" [label="LojaVirtual
+(Aplicacao)"];
+  "ep_login" [label="Login
+(Endpoint)"];
+  "ep_produto" [label="Produto
+(Endpoint)"];
+  "ep_carrinho" [label="Carrinho
+(Endpoint)"];
+  "ep_checkout" [label="Checkout
+(Endpoint)"];
+  "param_username" [label="username
+(Parametro)"];
+  "param_password" [label="password
+(Parametro)"];
+  "param_busca" [label="busca
+(Parametro)"];
+  "param_id_produto" [label="id_produto
+(Parametro)"];
+  "param_quantidade" [label="quantidade
+(Parametro)"];
+  "tv_sqli" [label="SQL Injection
+(TipoVulnerabilidade)"];
+  "tv_xss_refletido" [label="XSS refletido
+(TipoVulnerabilidade)"];
+  "tv_idor" [label="IDOR
+(TipoVulnerabilidade)"];
+  "vul_sqli_login_username" [label="SQLi no username de login
+(Vulnerabilidade)"];
+  "vul_sqli_busca_produto" [label="SQLi no parametro de busca
+(Vulnerabilidade)"];
+  "vul_xss_busca_produto" [label="XSS refletido na busca
+(Vulnerabilidade)"];
+  "vul_idor_carrinho_id_produto" [label="IDOR no carrinho
+(Vulnerabilidade)"];
+  "imp_exposicao_clientes" [label="Exposicao de dados de clientes
+(Impacto)"];
+  "imp_roubo_sessao" [label="Roubo de sessao
+(Impacto)"];
+  "imp_manipulacao_pedidos" [label="Manipulacao de pedidos
+(Impacto)"];
+  "tool_burp" [label="Burp Suite
+(Ferramenta)"];
+  "tool_nmap" [label="Nmap
+(Ferramenta)"];
+  "atk_bypass_login" [label="Bypass de login
+(Ataque)"];
+  "atk_roubo_sessao_cliente" [label="Roubo de sessao de cliente
+(Ataque)"];
+  "app_loja" -> "ep_login" [label="TEM_ENDPOINT"];
+  "app_loja" -> "ep_produto" [label="TEM_ENDPOINT"];
+  "app_loja" -> "ep_carrinho" [label="TEM_ENDPOINT"];
+  "app_loja" -> "ep_checkout" [label="TEM_ENDPOINT"];
+  "ep_login" -> "param_username" [label="TEM_PARAMETRO"];
+  "ep_login" -> "param_password" [label="TEM_PARAMETRO"];
+  "ep_produto" -> "param_busca" [label="TEM_PARAMETRO"];
+  "ep_produto" -> "param_id_produto" [label="TEM_PARAMETRO"];
+  "ep_carrinho" -> "param_id_produto" [label="TEM_PARAMETRO"];
+  "ep_carrinho" -> "param_quantidade" [label="TEM_PARAMETRO"];
+  "vul_sqli_login_username" -> "ep_login" [label="ESTA_NO_ENDPOINT"];
+  "vul_sqli_login_username" -> "param_username" [label="AFETA_PARAMETRO"];
+  "vul_sqli_login_username" -> "tv_sqli" [label="E_DO_TIPO"];
+  "vul_sqli_login_username" -> "imp_exposicao_clientes" [label="GERA_IMPACTO"];
+  "vul_sqli_busca_produto" -> "ep_produto" [label="ESTA_NO_ENDPOINT"];
+  "vul_sqli_busca_produto" -> "param_busca" [label="AFETA_PARAMETRO"];
+  "vul_sqli_busca_produto" -> "tv_sqli" [label="E_DO_TIPO"];
+  "vul_sqli_busca_produto" -> "imp_exposicao_clientes" [label="GERA_IMPACTO"];
+  "vul_xss_busca_produto" -> "ep_produto" [label="ESTA_NO_ENDPOINT"];
+  "vul_xss_busca_produto" -> "param_busca" [label="AFETA_PARAMETRO"];
+  "vul_xss_busca_produto" -> "tv_xss_refletido" [label="E_DO_TIPO"];
+  "vul_xss_busca_produto" -> "imp_roubo_sessao" [label="GERA_IMPACTO"];
+  "vul_idor_carrinho_id_produto" -> "ep_carrinho" [label="ESTA_NO_ENDPOINT"];
+  "vul_idor_carrinho_id_produto" -> "param_id_produto" [label="AFETA_PARAMETRO"];
+  "vul_idor_carrinho_id_produto" -> "tv_idor" [label="E_DO_TIPO"];
+  "vul_idor_carrinho_id_produto" -> "imp_manipulacao_pedidos" [label="GERA_IMPACTO"];
+  "vul_sqli_login_username" -> "tool_burp" [label="FOI_ENCONTRADA_COM"];
+  "vul_sqli_busca_produto" -> "tool_burp" [label="FOI_ENCONTRADA_COM"];
+  "vul_xss_busca_produto" -> "tool_burp" [label="FOI_ENCONTRADA_COM"];
+  "vul_idor_carrinho_id_produto" -> "tool_burp" [label="FOI_ENCONTRADA_COM"];
+  "atk_bypass_login" -> "vul_sqli_login_username" [label="EXPLORA_VULNERABILIDADE"];
+  "atk_bypass_login" -> "imp_exposicao_clientes" [label="PRODUZ_IMPACTO"];
+  "atk_roubo_sessao_cliente" -> "vul_xss_busca_produto" [label="EXPLORA_VULNERABILIDADE"];
+  "atk_roubo_sessao_cliente" -> "imp_roubo_sessao" [label="PRODUZ_IMPACTO"];
+}
