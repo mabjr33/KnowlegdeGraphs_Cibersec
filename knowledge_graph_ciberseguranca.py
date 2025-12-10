@@ -259,21 +259,103 @@ def exibir_vulnerabilidades_por_endpoint(grafo: GrafoConhecimento, endpoint_id: 
         print(f"   impacto: {formatar_lista_rotulos(impactos)}")
         print()
 
+def menu_interativo(grafo: GrafoConhecimento):
+    while True:
+        print()
+        print("Menu do Grafo de Ciberseguranca")
+        print("1 Consultar vulnerabilidades por endpoint")
+        print("2 Consultar vulnerabilidades por parametro")
+        print("3 Consultar impactos de uma vulnerabilidade")
+        print("4 Exportar grafo para DOT")
+        print("5 Listar todos os endpoints")
+        print("6 Listar todas as vulnerabilidades")
+        print("7 Sair")
+        print()
+
+        opcao = input("Escolha uma opcao: ")
+
+        if opcao == "1":
+            print()
+            endpoint_id = input("Digite o id do endpoint (ex ep_login): ")
+            vulns = grafo.vulnerabilidades_por_endpoint(endpoint_id)
+            print()
+
+            if not vulns:
+                print("Nenhuma vulnerabilidade encontrada para este endpoint")
+            else:
+                print("Vulnerabilidades")
+                print()
+                for v in vulns:
+                    tipos = grafo.tipos_de_vulnerabilidade(v.id)
+                    impactos = grafo.impactos_de_vulnerabilidade(v.id)
+                    print(f"• {v.rotulo}")
+                    print(f"  id {v.id}")
+                    print(f"  tipo {', '.join(t.rotulo for t in tipos)}")
+                    print(f"  impacto {', '.join(i.rotulo for i in impactos)}")
+                    print()
+
+        elif opcao == "2":
+            print()
+            parametro_id = input("Digite o id do parametro (ex param_busca): ")
+            vulns = grafo.vulnerabilidades_por_parametro(parametro_id)
+            print()
+
+            if not vulns:
+                print("Nenhuma vulnerabilidade afeta este parametro")
+            else:
+                print("Vulnerabilidades que afetam o parametro")
+                print()
+                for v in vulns:
+                    tipos = grafo.tipos_de_vulnerabilidade(v.id)
+                    impactos = grafo.impactos_de_vulnerabilidade(v.id)
+                    print(f"• {v.rotulo}")
+                    print(f"  id {v.id}")
+                    print(f"  tipo {', '.join(t.rotulo for t in tipos)}")
+                    print(f"  impacto {', '.join(i.rotulo for i in impactos)}")
+                    print()
+
+        elif opcao == "3":
+            print()
+            vul_id = input("Digite o id da vulnerabilidade (ex vul_xss_busca_produto): ")
+            impactos = grafo.impactos_de_vulnerabilidade(vul_id)
+            print()
+
+            if not impactos:
+                print("Nenhum impacto registrado para esta vulnerabilidade")
+            else:
+                print("Impactos")
+                print()
+                for i in impactos:
+                    print(f"• {i.rotulo}")
+
+        elif opcao == "4":
+            print()
+            caminho = "grafo_ciberseguranca.dot"
+            grafo.exportar_para_dot(caminho)
+            print(f"Arquivo {caminho} gerado com sucesso")
+
+        elif opcao == "5":
+            print()
+            print("Endpoints")
+            print()
+            for no in grafo.buscar_nos_por_tipo("Endpoint"):
+                print(f"• {no.rotulo}     id {no.id}")
+
+        elif opcao == "6":
+            print()
+            print("Vulnerabilidades")
+            print()
+            for no in grafo.buscar_nos_por_tipo("Vulnerabilidade"):
+                print(f"• {no.rotulo}     id {no.id}")
+
+        elif opcao == "7":
+            print("Saindo")
+            break
+
+        else:
+            print("Opcao invalida tente novamente")
 
 
 if __name__ == "__main__":
     grafo = criar_grafo_exemplo()
-
-    exibir_vulnerabilidades_por_endpoint(grafo, "ep_login", "login")
-    print()
-    exibir_vulnerabilidades_por_endpoint(grafo, "ep_produto", "produto")
-    print()
-
-    print("Impactos da vulnerabilidade de XSS na busca")
-    impactos_xss = grafo.impactos_de_vulnerabilidade("vul_xss_busca_produto")
-    for imp in impactos_xss:
-        print(f"• {imp.rotulo}")
-
-    # Exportar grafo para DOT
-    grafo.exportar_para_dot("grafo_ciberseguranca.dot")
-    print("\nArquivo grafo_ciberseguranca.dot gerado na pasta do projeto.")
+    menu_interativo(grafo)
