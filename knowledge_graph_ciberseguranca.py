@@ -137,6 +137,34 @@ class GrafoConhecimento:
 
             f.write("}\n")
 
+    def ataques_por_vulnerabilidade(self, vulnerabilidade_id: str) -> list[No]:
+        ataques = []
+        for r in self.relacoes:
+            if r.destino == vulnerabilidade_id and r.tipo == "EXPLORA_VULNERABILIDADE":
+                atk = self.nos.get(r.origem)
+                if atk:
+                    ataques.append(atk)
+        return ataques
+    
+    def vulnerabilidades_de_ataque(self, ataque_id: str) -> list[No]:
+        vulnerabilidades = []
+        for r in self.relacoes:
+            if r.origem == ataque_id and r.tipo == "EXPLORA_VULNERABILIDADE":
+                vul = self.nos.get(r.destino)
+                if vul:
+                    vulnerabilidades.append(vul)
+        return vulnerabilidades
+
+    def impactos_de_ataque(self, ataque_id: str) -> list[No]:
+        impactos = []
+        for r in self.relacoes:
+            if r.origem == ataque_id and r.tipo == "PRODUZ_IMPACTO":
+                imp = self.nos.get(r.destino)
+                if imp:
+                    impactos.append(imp)
+        return impactos
+
+
 
 
 
@@ -269,14 +297,16 @@ def menu_interativo(grafo: GrafoConhecimento):
         print("4 Exportar grafo para DOT")
         print("5 Listar todos os endpoints")
         print("6 Listar todas as vulnerabilidades")
-        print("7 Sair")
+        print("7 Listar ataques cadastrados")
+        print("8 Detalhar um ataque")
+        print("9 Sair")
         print()
 
         opcao = input("Escolha uma opcao: ")
 
         if opcao == "1":
             print()
-            endpoint_id = input("Digite o id do endpoint (ex ep_login): ")
+            endpoint_id = input("Digite o id do endpoint ex ep_login: ")
             vulns = grafo.vulnerabilidades_por_endpoint(endpoint_id)
             print()
 
@@ -290,13 +320,13 @@ def menu_interativo(grafo: GrafoConhecimento):
                     impactos = grafo.impactos_de_vulnerabilidade(v.id)
                     print(f"• {v.rotulo}")
                     print(f"  id {v.id}")
-                    print(f"  tipo {', '.join(t.rotulo for t in tipos)}")
-                    print(f"  impacto {', '.join(i.rotulo for i in impactos)}")
+                    print(f"  tipo {', '.join(t.rotulo for t in tipos) or 'nao mapeado'}")
+                    print(f"  impacto {', '.join(i.rotulo for i in impactos) or 'nao mapeado'}")
                     print()
 
         elif opcao == "2":
             print()
-            parametro_id = input("Digite o id do parametro (ex param_busca): ")
+            parametro_id = input("Digite o id do parametro ex param_busca: ")
             vulns = grafo.vulnerabilidades_por_parametro(parametro_id)
             print()
 
@@ -310,13 +340,13 @@ def menu_interativo(grafo: GrafoConhecimento):
                     impactos = grafo.impactos_de_vulnerabilidade(v.id)
                     print(f"• {v.rotulo}")
                     print(f"  id {v.id}")
-                    print(f"  tipo {', '.join(t.rotulo for t in tipos)}")
-                    print(f"  impacto {', '.join(i.rotulo for i in impactos)}")
+                    print(f"  tipo {', '.join(t.rotulo for t in tipos) or 'nao mapeado'}")
+                    print(f"  impacto {', '.join(i.rotulo for i in impactos) or 'nao mapeado'}")
                     print()
 
         elif opcao == "3":
             print()
-            vul_id = input("Digite o id da vulnerabilidade (ex vul_xss_busca_produto): ")
+            vul_id = input("Digite o id da vulnerabilidade ex vul_xss_busca_produto: ")
             impactos = grafo.impactos_de_vulnerabilidade(vul_id)
             print()
 
@@ -349,11 +379,49 @@ def menu_interativo(grafo: GrafoConhecimento):
                 print(f"• {no.rotulo}     id {no.id}")
 
         elif opcao == "7":
+            print()
+            print("Ataques cadastrados")
+            print()
+            ataques = grafo.buscar_nos_por_tipo("Ataque")
+            if not ataques:
+                print("Nenhum ataque cadastrado")
+            else:
+                for atk in ataques:
+                    print(f"• {atk.rotulo}     id {atk.id}")
+
+        elif opcao == "8":
+            print()
+            ataque_id = input("Digite o id do ataque ex atk_bypass_login: ")
+            vulnerabilidades = grafo.vulnerabilidades_de_ataque(ataque_id)
+            impactos = grafo.impactos_de_ataque(ataque_id)
+            print()
+
+            print("Detalhes do ataque")
+            print(f"id {ataque_id if 'attaque_id' in locals() else ataque_id}")
+            print()
+
+            print("Vulnerabilidades exploradas:")
+            if not vulnerabilidades:
+                print("• nenhuma vulnerabilidade associada")
+            else:
+                for v in vulnerabilidades:
+                    print(f"• {v.rotulo}     id {v.id}")
+            print()
+
+            print("Impactos gerados:")
+            if not impactos:
+                print("• nenhum impacto registrado")
+            else:
+                for i in impactos:
+                    print(f"• {i.rotulo}")
+
+        elif opcao == "9":
             print("Saindo")
             break
 
         else:
             print("Opcao invalida tente novamente")
+
 
 
 if __name__ == "__main__":
